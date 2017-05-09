@@ -40,8 +40,8 @@ void port_init(void)
 	out8(channel_handle, 0x44);
 	// Get a handle to the DAQ Control register
 	ctrl_handle = mmap_device_io( PORT_LENGTH, CTRL_ADDRESS );
-	// Setup input range of A/D to +/- 5V
-	out8( ctrl_handle, 0x01); //Step 2 input range
+	// Setup input range of A/D to +/- 10V
+	out8( ctrl_handle, 0x00); //Step 2 input range
 	// Get a handle to the MSB read register. Read only for MSB.
 	page_handle = mmap_device_io( PORT_LENGTH, PAGE_ADDRESS );
 

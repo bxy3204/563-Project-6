@@ -22,7 +22,6 @@
 
 double analog_read(void)
 {
-
 		while (in8(channel_handle) & 0x20); //let a/d settle
 		out8(data_handle, 0x80); // Trigger a/d conversion.
 
@@ -32,7 +31,7 @@ double analog_read(void)
 		lsb = in8(data_handle);  //LSB of a/d FIFO
 		msb = in8(page_handle); // MSB of a/d FIFO
 		ad_total = (msb * 256 + lsb) ; //16 Bit value of input voltage
-		voltage = (ad_total/32768.0f * 5); //Convert to volts
+		voltage = (ad_total/32768.0f * 10); //Convert to volts
 		//printf( "MSB:%d          LSB:%d		total:%.2fV\n",msb, lsb, voltage );
 		return voltage;
 

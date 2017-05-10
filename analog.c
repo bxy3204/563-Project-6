@@ -1,5 +1,6 @@
 /*
  * analog.c
+ *This module calculates the input voltage of an analog signal
  *
  *  Created on: May 3, 2017
  *      Author: bxy3204
@@ -7,7 +8,11 @@
 
 #include "port_setup.h"
 
- /* analog_read:
+ /* 					analog_read
+  * This function reads an analog input signal
+  * input:none
+  * output:Votlage calculated from A/D converter
+  * process:
  * Obtain a reading from the A/D on the helios box. This function waits for the a/d to settle
  * then initiates a conversion. Before reading data, the function will wait until the a/d has completed
  * the conversion. At most, this will take 5us. After the conversion is complete, the LSB of the FIFO is read

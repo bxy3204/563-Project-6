@@ -1,6 +1,6 @@
 /*
  * port_setup.h
- *
+ * Define constants for Project 6
  *  Created on: May 3, 2017
  *      Author: bxy3204
  */
@@ -16,24 +16,25 @@
 #ifndef PORT_SETUP_H_
 #define PORT_SETUP_H_
 
-#define DIOB_ADDRESS 0x289
-void portb_init();
-int ready_to_send();
+#define DIOB_ADDRESS 0x289  //Address  for DIOB
+
+void portb_init(); //Port setup function
+int ready_to_send(); //STM32 is ready to receive flag
 
 //PORT A
 
 #define DIO_ADDRESS 0x288
 #define DIO_CTRL_ADDRESS 0x28B
-
+#define CH4	0x44
+#define FIFO_CLR 0x10
+#define AOUTBIN 0x02
 #define INIT_BIT 0x00
 
 #define LOW 0L
 #define HIGH ~0L
 
-pthread_mutex_t pwm_mutex;
 
-
-int send_volts() ;
+void send_volts() ;
 void port_init();
 int root_perm();
 
@@ -57,7 +58,7 @@ uintptr_t channel_handle;
 uintptr_t page_handle ;
 uintptr_t polarity_handle ;
 uintptr_t datab_handle;
-
+//Digital variables
 int out_r;
 int lsb;
 int count;

@@ -1,65 +1,56 @@
-//#include "analog_in.h"
+/*
+ * Project.c
+ *  This project will read an analog input signal with a max amplitude of +/- 5V, and send the STM32
+ *  a value representing this value between 0 and 255
+ *  Created on: May 3, 2017
+ *      Author: bxy3204
+ */
+
+
 #include "port_setup.h"
 #include <math.h>
 
 
 double read_v;
-int stm_out=0;
-int x;
-struct timespec start, stop;
-double elapsed_time;
+int lsb_out=0;
+int msb_out=0;
 
-void comm_connection()
-{
-	clock_gettime( CLOCK_REALTIME, &stop);
-	if(stop.tv_nsec - start.tv_nsec > 20000000)
-	{
-		printf("COMMUNICATION LOST\n");
-	}
-}
 
 /* ______________________________________________________________________ */
 int
 main( )
 {
-	root_perm();
-	port_init();
+	root_perm(); //Get root permission
+	port_init(); //Initialize ports
 	int flag = 255;
+	//Wait for STM32 to be ready to receive
 	while(flag == 255)
 	{
 		flag = ready_to_send();
 	}
 	while(1){
-		read_v = analog_read();
+		read_v = analog_read(); //Read analog input voltage
+		//Check the amplitude of incoming signal. Input signals should be limited to a max of +/- 5 volts.
 		while(read_v > 5 || read_v < -5)
 		{
 			printf("VOLTAGE OUT OF RANGE(%.2f)! PLEASE REDUCE INPUT SIGNAL\n", read_v);
 			sleep(1);
 			read_v = analog_read();
 		}
-		read_v =  ((read_v+5)/0.667f);
-		stm_out = (int)(0.5f + read_v);
-		flag = ready_to_send();
+		/*Convert the voltage from a +/-5V scale to a 0-10 scale and divide by .0392 to get a value between 0-255.
+		 * This value represents a position on the servo controlled by the STM32.
+		 * The servo position value will be sent as 2 4 bit values.
+		 */
+		read_v =  ((read_v+5)/0.0392f);
+		lsb_out = (int)(0.5f + read_v); //Round the position value to a whole number
+		msb_out = (lsb_out & 240)>>4; // 4 bit MSB of servo position
+		lsb_out = lsb_out & 15; //4 bit LSB of servo position
 
-		//Send flag + voltage read
-		send_volts(16 + stm_out);
-		clock_gettime( CLOCK_REALTIME, &start) ;
-		//Wait for STM32 to indicate voltage received
-		while(flag == 255)
-		{
-			comm_connection();
-			send_volts(16 + stm_out);
-			flag = ready_to_send();
-		}
-		clock_gettime( CLOCK_REALTIME, &start) ;
-		//Clear flag but continue sending voltage
-		send_volts(stm_out);
-		//Wait for STM32 to finish reading voltage
-		while(flag == 254)
-		{
-			comm_connection();
-			flag = ready_to_send();
-		}
+		//send lsb
+		send_volts(lsb_out);
+		//send msb
+		send_volts(msb_out);
+
 	}
 
 	return 0;
